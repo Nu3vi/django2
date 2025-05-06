@@ -1,0 +1,2 @@
+ADMINISTRADOR = 1
+
