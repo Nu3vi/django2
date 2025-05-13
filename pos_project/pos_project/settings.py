@@ -20,20 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^rzj^j%k*gr@xu&vdi2&2%-&j*8k1o(u2)ly)hy&)9jr3#9@_t'
+SECRET_KEY = 'django-insecure-3m(k1^6bq(*0_gxsh8)ls61_my=tra^5ppv(xf-63hra%1i^t^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Application definition
@@ -45,8 +37,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'pos_project',
     'core',
-    'accounts'
+    'accounts',
+    'rest_framework',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -54,9 +55,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Debe ir antes
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware'
 ]
 
 ROOT_URLCONF = 'pos_project.urls'
@@ -64,8 +67,9 @@ ROOT_URLCONF = 'pos_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
+        # options to configure
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -86,7 +90,7 @@ WSGI_APPLICATION = 'pos_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'miguel_cubas',
         'USER': 'admin_pedidos',
         'PASSWORD': '123456',
         'HOST': 'switchback.proxy.rlwy.net',
@@ -113,6 +117,62 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+# Auth settings
+AUTH_USER_MODEL = 'accounts.Usuario'  # Asegúrate de que está correctamente configurado
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
+
+# Allauth settings
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # O tu proveedor SMTP
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'tu-email@gmail.com'
+EMAIL_HOST_PASSWORD = 'tu-contraseña-o-clave-de-app'
+DEFAULT_FROM_EMAIL = 'Sistema POS <tu-email@gmail.com>'
+
+# Social providers settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': 'tu-client-id-de-google',
+            'secret': 'tu-secret-de-google',
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    },
+    'facebook': {
+        'APP': {
+            'client_id': 'tu-client-id-de-facebook',
+            'secret': 'tu-secret-de-facebook',
+            'key': ''
+        },
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'VERIFIED_EMAIL': True,
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -130,6 +190,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Duración de la sesión (2 semanas, en segundos)
+SESSION_COOKIE_AGE = 1209600
+
+# Cerrar la sesión cuando el usuario cierra el navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Usar cookies seguros (solo transmitir por HTTPS)
+SESSION_COOKIE_SECURE = False  # Cambiar a True en producción con HTTPS
+
+# Motor de almacenamiento de sesiones
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Almacenar en la base de datos
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

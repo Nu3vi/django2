@@ -20,4 +20,6 @@ urlpatterns = [
     path('orden/<uuid:pedido_id>/', views.order_detail, name='order_detail'),
     path('orden/cancelar/<uuid:pedido_id>/', views.cancel_order, name='cancel_order'),
     path('orden/pdf/<uuid:pedido_id>/', views.generate_pdf_order, name='generate_pdf_order'),
+
+
 ]

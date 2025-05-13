@@ -1,7 +1,4 @@
-/* Estilos personalizados para el Sistema POS */
-
-/* Variables de colores */
-:root {
+root {
     --primary-dark: #0d47a1;
     --success-dark: #1b5e20;
     --warning-dark: #e65100;
@@ -104,7 +101,6 @@ a {
     border-color: var(--primary-dark);
 }
 
-/* Adaptaciones responsivas */
 @media (max-width: 768px) {
     .card-body {
         padding: 1rem;
